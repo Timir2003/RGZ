@@ -14,7 +14,6 @@ def client():
             db.drop_all()
 
 def test_register(client):
-    """Тест регистрации"""
     response = client.post('/api/register', json={
         'username': 'testuser',
         'password': 'testpass'
@@ -24,11 +23,8 @@ def test_register(client):
     assert data['success'] == True
 
 def test_login(client):
-    """Тест входа"""
-    # Сначала регистрируем
     client.post('/api/register', json={'username': 'test', 'password': 'test'})
     
-    # Потом входим
     response = client.post('/api/login', json={'username': 'test', 'password': 'test'})
     assert response.status_code == 200
     data = response.get_json()
