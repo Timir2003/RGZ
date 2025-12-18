@@ -14,7 +14,12 @@ jobs:
         python-version: '3.9'
     
     - name: Поставить всё нужное
-      run: pip install flask flask-login pytest bandit
+      run: |
+        pip install flask
+        pip install flask-login
+        pip install flask-sqlalchemy
+        pip install pytest
+        pip install bandit
     
     - name: Проверить безопасность
       run: bandit -r src/
