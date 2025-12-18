@@ -6,7 +6,6 @@ import time
 BASE_URL = "http://127.0.0.1:5000"
 
 def print_response(name, response):
-    """Красиво печатает ответ"""
     print(f"\n{'='*60}")
     print(f"{name}")
     print(f"URL: {response.url}")
@@ -20,7 +19,6 @@ def print_response(name, response):
     print("="*60)
 
 def test_api():
-    """Выполняет все тестовые запросы"""
     
     # Проверка сервера
     print("Проверка сервера...")
@@ -88,7 +86,7 @@ def test_api():
                             cookies=premium_cookies)
     print_response("Premium добавляет материал", response)
     
-    # Basic пытается добавить (должна быть ошибка)
+    # Basic пытается добавить
     data = {
         "name": "Курс от Basic",
         "description": "Не должен добавиться",
@@ -120,7 +118,7 @@ def test_api():
                           cookies=premium_cookies)
     print_response("Premium получает Premium материал", response)
     
-    # Basic пытается получить тот же материал (должна быть ошибка)
+    # Basic пытается получить тот же материал
     response = requests.get(f"{BASE_URL}/api/resources/1", 
                           cookies=basic_cookies)
     print_response("Basic пытается получить Premium материал", response)
@@ -153,7 +151,6 @@ def test_api():
     print_response("Доступ без авторизации (ожидаем 401)", response)
 
 def test_abac_scenarios():
-    """Тестирование ABAC сценариев"""
     print("\nТЕСТИРОВАНИЕ ABAC СЦЕНАРИЕВ")
     
     # Создаём пользователя с frozen аккаунтом
@@ -178,7 +175,7 @@ def test_abac_scenarios():
                           cookies=frozen_cookies)
     print_response("Frozen пользователь пытается получить материалы", response)
     
-    # 2. Материал с ограничением по времени
+    # Материал с ограничением по времени
     print("\n2. Материал с ограничением по времени")
     
     # Сначала добавим материал (через нового premium пользователя)
@@ -225,6 +222,10 @@ def test_abac_scenarios():
     materials = response.json().get('resources', [])
     for material in materials:
         if "Утренний курс" in material['name']:
-            print(f"Материал '{material['name']}' НЕ доступен (вне времени)")
+            print(f"❌ Материал '{material['name']}' НЕ доступен (вне времени)")
         else:
             print(f"Материал '{material['name']}' доступен")
+
+if __name__ == "__main__":
+    test_api()
+    test_abac_scenarios()
