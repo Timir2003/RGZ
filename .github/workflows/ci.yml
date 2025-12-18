@@ -14,10 +14,12 @@ jobs:
         python-version: '3.9'
     
     - name: Поставить зависимости
-      run: pip install -r requirements.txt
+      run: |
+        pip install pbr  # сначала pbr
+        pip install -r requirements.txt
     
     - name: Проверить безопасность
       run: bandit -r src/
     
-    - name: Запустить тесты (игнорировать падения)
-      run: python -m pytest tests/ || true
+    - name: Запустить тесты
+      run: python -m pytest tests/
