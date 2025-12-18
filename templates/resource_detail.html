@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Детали материала</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Детали материала</h1>
+        <div id="resourceDetails">
+            <p>Загрузка...</p>
+        </div>
+        <a href="/resources">← Назад к списку</a>
+        <a href="/">Главная</a>
+    </div>
+    
+    <script>
+        // Простой вариант
+        async function loadResourceDetails() {
+            const path = window.location.pathname.split('/');
+            const resourceId = path[path.length - 1] || path[path.length - 2];
+            
+            try {
+                const response = await fetch(`/api/resources/${resourceId}`);
+                const result = await response.json();
+                
+                const container = document.getElementById('resourceDetails');
+                
+                if (result.success) {
+                    container.innerHTML = `
+                        <h2>${result.name}</h2>
+                        <p>${result.description || 'Без описания'}</p>
+                        <p><strong>Уровень:</strong> ${result.access_level}</p>
+                        <p><strong>Время доступа:</strong> ${result.available_hours}</p>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="error">
+                            <h3>Доступ запрещён!</h3>
+                            <p>${result.message || 'Причина неизвестна'}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('resourceDetails').innerHTML = `
+                    <p class="error">Ошибка: ${error.message}</p>
+                `;
+            }
+        }
+        
+        // Запускаем
+        loadResourceDetails();
+    </script>
+</body>
+</html>

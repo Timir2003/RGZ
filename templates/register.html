@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Регистрация в системе</h1>
+        <form id="registerForm">
+            <input type="text" name="username" placeholder="Логин" required>
+            <input type="password" name="password" placeholder="Пароль" required id="password1">
+            <input type="password" placeholder="Повторите пароль" required id="password2">
+            
+            <label>Уровень подписки:</label>
+            <select name="subscription_level">
+                <option value="basic">Basic (бесплатно)</option>
+                <option value="premium">Premium (платно)</option>
+            </select>
+            
+            <label>Статус аккаунта:</label>
+            <select name="account_status">
+                <option value="active">Активный</option>
+                <option value="frozen">Заморожен (для теста)</option>
+            </select>
+            
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+        <p id="message"></p>
+        <a href="/login">Уже есть аккаунт? Войти</a>
+        <br>
+        <a href="/">На главную</a>
+    </div>
+    
+    <script>
+        // ПРОСТАЯ ПРОВЕРКА: пароли должны совпадать
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const password1 = document.getElementById('password1').value;
+            const password2 = document.getElementById('password2').value;
+            
+            // Проверяем совпадение паролей
+            if (password1 !== password2) {
+                alert('Ошибка: Пароли не совпадают!');
+                e.preventDefault(); // Останавливаем отправку формы
+                return false;
+            }
+            
+            // Если всё ок, форма отправится как обычно
+        });
+        
+        // Обработка отправки формы на сервер
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            // Если проверка не прошла, выходим
+            if (e.defaultPrevented) {
+                return;
+            }
+            
+            e.preventDefault(); // Останавливаем стандартную отправку
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            const result = await res.json();
+            const messageEl = document.getElementById('message');
+            messageEl.textContent = result.message;
+            messageEl.className = result.success ? 'success' : 'error';
+            
+            if (result.success) {
+                setTimeout(() => window.location.href = '/login', 1500);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ABAC Система</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>ABAC Система доступа к материалам</h1>
+        <p>Управление доступом на основе атрибутов</p>
+        <div class="menu">
+            <a href="/login" class="btn">Вход</a>
+            <a href="/register" class="btn">Регистрация</a>
+            <a href="/resources" class="btn">Материалы</a>
+        </div>
+        <div class="info">
+            <h3>Текущий пользователь: <span id="username">Гость</span></h3>
+            <button onclick="logout()" id="logoutBtn" style="display:none">Выйти</button>
+        </div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>
