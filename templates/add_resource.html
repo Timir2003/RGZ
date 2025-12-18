@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Добавить материал</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Добавить новый материал</h1>
+        <form id="addForm">
+            <input type="text" name="name" placeholder="Название" required>
+            <textarea name="description" placeholder="Описание"></textarea>
+            
+            <label>Уровень доступа:</label>
+            <select name="access_level">
+                <option value="basic">Basic (для всех)</option>
+                <option value="premium">Premium (только для premium)</option>
+            </select>
+            
+            <label>Время доступа:</label>
+            <input type="text" name="available_hours" value="09:00-18:00" placeholder="09:00-18:00">
+            
+            <button type="submit">Добавить</button>
+        </form>
+        <p id="message"></p>
+        <a href="/resources">Назад к материалам</a>
+    </div>
+    
+    <script>
+        document.getElementById('addForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            const res = await fetch('/api/resources', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            const result = await res.json();
+            const messageEl = document.getElementById('message');
+            
+            if (result.success) {
+                messageEl.textContent = `Материал добавлен! ID: ${result.resource_id}`;
+                messageEl.className = 'success';
+                e.target.reset();
+            } else {
+                messageEl.textContent = `Ошибка: ${result.message}`;
+                messageEl.className = 'error';
+            }
+        });
+    </script>
+</body>
+</html>

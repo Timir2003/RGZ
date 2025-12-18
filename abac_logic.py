@@ -1,20 +1,20 @@
 from datetime import datetime
 from models import Policy
 
-# Проверяет доступ пользователя к ресурсу по политикам из БД
+# Проверка доступа пользователя к ресурсу по политикам из БД
 def check_access(user, resource, client_ip=None):
     """
     Проверяет доступ пользователя к ресурсу
     """
-    # 1. Статус аккаунта
+    # Статус аккаунта
     if user.account_status != 'active':
         return False, 'Аккаунт не активен'
     
-    # 2. Уровень подписки
+    # Уровень подписки
     if resource.access_level == 'premium' and user.subscription_level != 'premium':
         return False, 'Требуется premium подписка'
     
-    # 3. Проверка времени (с учётом "всегда доступно")
+    # Проверка времени
     if resource.available_hours != '00:00-23:59':
         current_time = datetime.now().time()
         start_str, end_str = resource.available_hours.split('-')

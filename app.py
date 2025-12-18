@@ -12,7 +12,7 @@ app.config.from_object(Config)
 db.init_app(app)
 login_manager.init_app(app)
 
-# ==================== ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ ====================
+# ИНИЦИАЛИЗАЦИЯ БАЗЫ ДАННЫХ
 with app.app_context():
     db.create_all()
     # Добавляем тестовые политики
@@ -30,12 +30,11 @@ with app.app_context():
         test_resources = [
             Resource(name='Python Basics', description='Основы Python', access_level='basic', available_hours='09:00-18:00'),
             Resource(name='Flask Advanced', description='Продвинутый Flask', access_level='premium', available_hours='00:00-23:59'),
-            Resource(name='SQL Databases', description='Базы данных', access_level='basic', available_hours='09:00-18:00'),
+            Resource(name='SQL Database', description='База данных', access_level='basic', available_hours='09:00-20:00'),
         ]
         db.session.add_all(test_resources)
         db.session.commit()
 
-# ==================== HTML СТРАНИЦЫ ====================
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -58,9 +57,16 @@ def resources_page():
 def resource_detail_page(resource_id):
     return render_template('resource_detail.html', resource_id=resource_id)
 
-# ==================== API ЭНДПОИНТЫ ====================
+@app.route('/add-resource')
+@login_required
+def add_resource_page():
+    if current_user.subscription_level != 'premium':
+        return "Только premium пользователи могут добавлять материалы", 403
+    return render_template('add_resource.html')
 
-# 1. Регистрация
+# API ЭНДПОИНТЫ
+
+# Регистрация
 @app.route('/api/register', methods=['POST'])
 def api_register():
     data = request.json
@@ -72,7 +78,7 @@ def api_register():
     success, message = register_user(username, password, subscription_level, account_status)
     return jsonify({'success': success, 'message': message})
 
-# 2. Вход
+# Вход
 @app.route('/api/login', methods=['POST'])
 def api_login():
     data = request.json
@@ -82,7 +88,7 @@ def api_login():
     success, message = login_user_logic(username, password)
     return jsonify({'success': success, 'message': message})
 
-# 3. Проверка авторизации
+# Проверка авторизации
 @app.route('/api/check', methods=['GET'])
 def api_check():
     if current_user.is_authenticated:
@@ -93,14 +99,14 @@ def api_check():
         })
     return jsonify({'authenticated': False})
 
-# 4. Выход
+# Выход
 @app.route('/api/logout', methods=['POST'])
 @login_required
 def api_logout():
     logout_user()
     return jsonify({'success': True, 'message': 'Вы вышли'})
 
-# 5. Добавление ресурса
+# Добавление ресурса
 @app.route('/api/resources', methods=['POST'])
 @login_required
 def api_add_resource():
@@ -118,7 +124,7 @@ def api_add_resource():
     db.session.commit()
     return jsonify({'success': True, 'resource_id': new_resource.id})
 
-# 6. Получение всех ресурсов
+# Получение всех ресурсов
 @app.route('/api/resources', methods=['GET'])
 @login_required
 def api_get_resources():
@@ -151,15 +157,15 @@ def api_get_resources():
     print(f"\nИтого доступно: {len(accessible_resources)} материалов")
     return jsonify({'resources': accessible_resources})
 
-# 7. Получение конкретного ресурса
+# Получение конкретного ресурса
 @app.route('/api/resources/<int:resource_id>', methods=['GET'])
 @login_required
 def api_get_resource(resource_id):
-    print(f"🔍 Запрос ресурса {resource_id} от пользователя {current_user.username}")
+    print(f"Запрос ресурса {resource_id} от пользователя {current_user.username}")
     
     resource = Resource.query.get(resource_id)
     if not resource:
-        print(f"❌ Ресурс {resource_id} не найден")
+        print(f"Ресурс {resource_id} не найден")
         return jsonify({'success': False, 'message': 'Ресурс не найден'}), 404
     
     allowed, message = check_access(current_user, resource, request.remote_addr)
@@ -177,7 +183,7 @@ def api_get_resource(resource_id):
         'available_hours': resource.available_hours
     })
 
-# 8. Добавление политики (для админов)
+# Добавление политики (для админов)
 @app.route('/api/policies', methods=['POST'])
 @login_required
 def api_add_policy():
