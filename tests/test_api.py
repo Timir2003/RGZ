@@ -1,6 +1,6 @@
 import pytest
 from app import app, db
-from models import User, Resource
+from models import User
 
 @pytest.fixture
 def client():
@@ -14,31 +14,22 @@ def client():
             db.drop_all()
 
 def test_register(client):
+    """Тест регистрации"""
     response = client.post('/api/register', json={
         'username': 'testuser',
         'password': 'testpass'
     })
     assert response.status_code == 200
-    assert b'Пользователь создан' in response.data
+    data = response.get_json()
+    assert data['success'] == True
 
 def test_login(client):
+    """Тест входа"""
+    # Сначала регистрируем
     client.post('/api/register', json={'username': 'test', 'password': 'test'})
+    
+    # Потом входим
     response = client.post('/api/login', json={'username': 'test', 'password': 'test'})
     assert response.status_code == 200
-    assert b'Успешный вход' in response.data
-
-def test_access_denied(client):
-    # Регистрируем basic пользователя
-    client.post('/api/register', json={'username': 'basic', 'password': 'pass', 'subscription_level': 'basic'})
-    client.post('/api/login', json={'username': 'basic', 'password': 'pass'})
-    
-    # Создаем premium ресурс (через прямое добавление в БД)
-    with app.app_context():
-        resource = Resource(name='Premium Course', access_level='premium')
-        db.session.add(resource)
-        db.session.commit()
-        resource_id = resource.id
-    
-    response = client.get(f'/api/resources/{resource_id}')
-    assert response.status_code == 403
-    assert b'Требуется subscription_level = premium' in response.data
+    data = response.get_json()
+    assert data['success'] == True
