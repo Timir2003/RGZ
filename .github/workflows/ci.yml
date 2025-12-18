@@ -1,5 +1,4 @@
 name: Simple CI
-
 on: [push]
 
 jobs:
@@ -9,14 +8,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set up Python
+    - name: Установить Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.9'
-            
-    - name: Run security check
-      run: |
-        bandit -r src/
     
-    - name: Run tests
+    - name: Поставить bandit
+      run: pip install bandit
+    
+    - name: Проверить безопасность
+      run: bandit -r src/
+    
+    - name: Запустить тесты
       run: python -m pytest tests/
