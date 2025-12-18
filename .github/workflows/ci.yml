@@ -13,8 +13,8 @@ jobs:
       with:
         python-version: '3.9'
     
-    - name: Поставить bandit
-      run: pip install bandit
+    - name: Поставить всё нужное
+      run: pip install bandit pytest
     
     - name: Проверить безопасность
       run: bandit -r src/
