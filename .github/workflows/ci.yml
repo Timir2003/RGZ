@@ -13,8 +13,8 @@ jobs:
       with:
         python-version: '3.9'
     
-    - name: Поставить зависимости
-      run: pip install -r requirements.txt
+    - name: Поставить всё нужное
+      run: pip install flask pytest bandit
     
     - name: Проверить безопасность
       run: bandit -r src/
